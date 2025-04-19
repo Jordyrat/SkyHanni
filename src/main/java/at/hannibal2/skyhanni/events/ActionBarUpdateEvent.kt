@@ -9,4 +9,4 @@ class ActionBarUpdateEvent(var actionBar: String, var chatComponent: IChatCompon
         chatComponent = newText.asComponent()
     }
 }
-class ActionBarBeforeUpdateEvent(val actionBar: String, val chatComponent: IChatComponent) : LorenzEvent()
+class ActionBarBeforeUpdateEvent(val actionBar: String, val chatComponent: IChatComponent) : SkyHanniEvent()

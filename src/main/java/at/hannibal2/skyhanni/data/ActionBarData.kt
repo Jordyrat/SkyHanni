@@ -13,19 +13,14 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import kotlinx.coroutines.launch
 import net.minecraft.util.IChatComponent
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ActionBarData {
+    private var actionBar = ""
     private var debugActionBar: String? = null
 
     fun getActionBar() = actionBar
-    var actionBar = ""
-        private set
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -67,29 +62,21 @@ object ActionBarData {
         actionBar = ""
     }
 
+
+    @HandleEvent(priority = 0, receiveCancelled = true)
+    fun onActionBarReceive(event: ClientChatReceivedEvent) {
+        if (event.type.toInt() != 2) return
+
+        ActionBarBeforeUpdateEvent(event.message.formattedText.stripHypixelMessage(), event.message).post()
+    }
+
+
     /**
      * If the action bar is modified return the new one, otherwise return null.
      */
     fun onChatReceive(component: IChatComponent): IChatComponent? {
         val message = debugActionBar ?: component.formattedText.stripHypixelMessage()
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onActionBarReceive(event: ClientChatReceivedEvent) {
-        if (event.type.toInt() != 2) return
 
-        ActionBarBeforeUpdateEvent(event.message.formattedText.stripHypixelMessage(), event.message).postAndCatch()
-    }
-
-
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChatReceive(event: ClientChatReceivedEvent) {
-        //#if MC<1.12
-        if (event.type.toInt() != 2) return
-        //#else
-        //$$ if (event.type.id.toInt() != 2) return
-        //#endif
-
-        val original = event.message
-        val message = LorenzUtils.stripVanillaMessage(original.formattedText)
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, component)
         actionBarEvent.post()
