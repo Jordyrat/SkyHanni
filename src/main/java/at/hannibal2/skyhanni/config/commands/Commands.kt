@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
@@ -28,15 +29,11 @@ import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.EliteFarmingCollectionDisplay
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
+import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -47,7 +44,6 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.skillprogress.EliteSkillRankDisplay
-import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -218,11 +214,6 @@ object Commands {
             description = "Refresh the Pest Kills Leaderboard Display"
             category = CommandCategory.USERS_RESET
             callback { ElitePestKillsDisplay.reset() }
-        }
-        event.register("shresetghostcounter") {
-            description = "Resets the ghost counter"
-            category = CommandCategory.USERS_RESET
-            callback { GhostUtil.reset() }
         }
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"

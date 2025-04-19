@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.other
 
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

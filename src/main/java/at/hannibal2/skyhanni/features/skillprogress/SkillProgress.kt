@@ -152,12 +152,12 @@ object SkillProgress {
         skillExpPercentage = 0.0
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         update()
         updateSkillInfo()
-        if (!isEnabled()) return
+        if (!config.enabled.get()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         allDisplay = formatAllDisplay(drawAllDisplay())

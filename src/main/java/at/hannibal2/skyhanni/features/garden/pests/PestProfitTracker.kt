@@ -14,10 +14,9 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -44,7 +43,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -196,16 +194,16 @@ object PestProfitTracker {
         adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestKill(event: PestKillEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
         tracker.addItem(event.item, event.amount, false)
-        addKill()
+        addKill(event.pestType)
         if (config.hideChat) event.blockedReason = "pest_drop"
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         tracker.addItem(internalName, amount, command)
     }
 

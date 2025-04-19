@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -90,9 +89,9 @@ object GardenCropMilestoneFix {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestKill(event: PestKillEvent) {
-        val primitiveStack = NEUItems.getPrimitiveMultiplier(event.item)
+        val primitiveStack = NeuItems.getPrimitiveMultiplier(event.item)
         val rawName = primitiveStack.internalName.itemNameWithoutColor
         val cropType = CropType.getByNameOrNull(rawName) ?: return
 
