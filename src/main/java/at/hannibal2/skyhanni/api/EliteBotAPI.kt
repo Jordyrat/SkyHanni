@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -22,7 +21,7 @@ object EliteBotAPI {
     var profileID: UUID? = null
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
         checkDuration = data.refreshTimeMinutes.minutes
@@ -30,8 +29,8 @@ object EliteBotAPI {
         disableRefreshCommand = data.disableRefreshCommand
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (event.message.startsWith("§8Profile ID: ")) {
             val id = event.message.removePrefix("§8Profile ID: ")
             val newID = try {

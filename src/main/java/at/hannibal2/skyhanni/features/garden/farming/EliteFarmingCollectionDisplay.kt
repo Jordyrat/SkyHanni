@@ -14,13 +14,12 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -36,7 +36,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -76,22 +75,22 @@ object EliteFarmingCollectionDisplay {
 
     private var display = listOf<Renderable>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (GardenAPI.hideExtraGuis()) return
+        if (GardenApi.hideExtraGuis()) return
         if (!isEnabled()) return
 
         config.pos.renderRenderables(display, posLabel = "Farming Collection Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.crop.afterChange {
             lastLeaderboardFetch = SimpleTimeMark.farPast()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (EliteBotAPI.profileID == null) return
@@ -129,7 +128,7 @@ object EliteFarmingCollectionDisplay {
         lastBrokenCrop = crop
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         resetData()
     }
@@ -196,10 +195,10 @@ object EliteFarmingCollectionDisplay {
 
         val newDisplay = mutableListOf<Renderable>()
         newDisplay.add(
-            Renderable.clickAndHover(
-                "§6§l$lastFetchedCrop: §e${collection.addSeparators()} $displayPosition",
-                listOf("§eClick to open your Farming Profile."),
-                onClick = {
+            Renderable.clickable(
+                text = "§6§l$lastFetchedCrop: §e${collection.addSeparators()} $displayPosition",
+                tips = listOf("§eClick to open your Farming Profile."),
+                onLeftClick = {
                     OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/")
                     ChatUtils.chat("Opening Farming Profile of player §b${LorenzUtils.getPlayerName()}")
                 }
@@ -229,10 +228,10 @@ object EliteFarmingCollectionDisplay {
             )
         } else if (difference < 0) {
             newDisplay.add(
-                Renderable.clickAndHover(
-                    "§7You have passed §b#${nextRank.addSeparators()}",
-                    listOf("§bClick to refresh."),
-                    onClick = {
+                Renderable.clickable(
+                    text = "§7You have passed §b#${nextRank.addSeparators()}",
+                    tips = listOf("§bClick to refresh."),
+                    onLeftClick = {
                         lastLeaderboardFetch = SimpleTimeMark.farPast()
                         ChatUtils.chat("Collection leaderboard updating...")
                     }
@@ -262,7 +261,7 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-        val response = APIUtils.getJSONResponseAsElement(url)
+        val response = ApiUtils.getJSONResponseAsElement(url, apiName = "Elite Farming Ranks")
 
         try {
             val data = eliteCollectionApiGson.fromJson<EliteLeaderboard>(response)
@@ -304,7 +303,7 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/crops?days=1"
-        val response = APIUtils.getJSONResponseAsElement(url)
+        val response = ApiUtils.getJSONResponseAsElement(url, apiName = "Elite Farming Collection")
 
         try {
             val data = eliteCollectionApiGson.fromJson<Array<EliteCollectionGraphEntry>>(response)
@@ -331,5 +330,5 @@ object EliteFarmingCollectionDisplay {
         else -> crop.simpleName
     }
 
-    private fun isEnabled() = config.display && LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)
+    private fun isEnabled() = config.display && LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
 }

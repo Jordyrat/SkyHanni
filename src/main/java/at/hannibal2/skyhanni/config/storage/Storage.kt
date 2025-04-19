@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.config.storage
 
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.UUID
+
 
 class Storage {
     @Expose
@@ -23,8 +26,9 @@ class Storage {
 
     @Deprecated(
         message = "Use SkyHanniMod.visualWordsData.modifiedWords instead.",
-        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords")
+        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords"),
     )
+
     @Expose
     var modifiedWords: List<VisualWord> = listOf()
 
@@ -42,6 +46,15 @@ class Storage {
 
     @Expose
     var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
+
+    @Expose
+    var lastCropBroken: CropType? = null
+
+    @Expose
+    var lastSkillObtained: String? = null
+
+    @Expose
+    var lastPestKilled: PestType? = null
 
     // TODO this should get moved into player specific
     @Expose
